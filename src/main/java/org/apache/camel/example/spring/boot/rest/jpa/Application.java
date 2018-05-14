@@ -43,9 +43,10 @@ public class Application extends SpringBootServletInitializer {
                     .apiProperty("api.title", "Camel REST API")
                     .apiProperty("api.version", "1.0")
                     .apiProperty("cors", "true")
-                    .apiContextRouteId("doc-api")
-                .bindingMode(RestBindingMode.json);
-
+                    .apiContextRouteId("doc-api")   
+                .bindingMode(RestBindingMode.json)
+                .host("localhost").port(8080);
+            
             rest("/books").description("Books REST service")
                 .get("/").description("The list of all the books")
                     .route().routeId("books-api")
@@ -53,7 +54,15 @@ public class Application extends SpringBootServletInitializer {
                     .endRest()
                 .get("order/{id}").description("Details of an order by id")
                     .route().routeId("order-api")
-                    .bean(Database.class, "findOrder(${header.id})");
+                    .bean(Database.class, "findOrder(${header.id})")
+                    .endRest()
+                 .get("order/api/{id}").description("Details of an order by id")
+                    .route().routeId("order-api-direct")
+                    .bean(Database.class, "findOrder(${header.id})")
+                    .to("direct:start");
+                    
+            from("direct:start")
+            .to("rest:get:/books/2?bridgeEndpoint=true");
         }
     }
 
