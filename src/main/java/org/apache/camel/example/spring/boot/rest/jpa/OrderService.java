@@ -35,4 +35,9 @@ public class OrderService {
         order.setBook(books.findOne(amount.nextInt(2) + 1));
         return order;
     }
+    
+    public String generateOrderBody() {
+        
+        return "1,2,3";
+    }
 }
